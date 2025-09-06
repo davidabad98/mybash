@@ -18,15 +18,6 @@ readonly NC='\033[0m' # No Color
 PACKAGE_MANAGER=""
 PRIVILEGE_CMD=""
 
-# ---- Configurable defaults ---------------------------------------------------
-DEV_USER="${SUDO_USER:-$USER}"
-DEV_HOME="/home/${DEV_USER}"
-DEV_DIR="${DEV_HOME}/dev"
-GIT_NAME="${GIT_NAME:-David Abad}"          # optional: export GIT_NAME="Your Name" before running
-GIT_EMAIL="${GIT_EMAIL:-david@corp.paymentevolution.com}"        # optional: export GIT_EMAIL="you@example.com" before running
-SET_TIMEZONE="${SET_TIMEZONE:-America/Toronto}"  # optional: export SET_TIMEZONE="America/Toronto"
-# ------------------------------------------------------------------------------
-
 # Logging functions
 log_info() {
     printf "${BLUE}[INFO]${NC} %s\n" "$1"
@@ -342,41 +333,8 @@ EOF
     fi
 }
 
-# Optional timezone setup
-setup_timezone() {
-    if [[ -n "${SET_TIMEZONE}" ]]; then
-      echo "[step] Setting timezone to ${SET_TIMEZONE}..."
-      sudo ln -fs "/usr/share/zoneinfo/${SET_TIMEZONE}" /etc/localtime
-      sudo dpkg-reconfigure -f noninteractive tzdata
-    fi
-}
-
-# Git sane defaults (optional if provided via env)
-setup_git_creds() {
-    if [[ -n "${GIT_NAME}" ]]; then
-      git config --global user.name "${GIT_NAME}"
-    fi
-    if [[ -n "${GIT_EMAIL}" ]]; then
-      git config --global user.email "${GIT_EMAIL}"
-    fi
-    git config --global init.defaultBranch master
-}
-
-# SSH key generation (optional; only if none present)
-generate_ssh() {
-    if [[ ! -f "${DEV_HOME}/.ssh/id_ed25519" ]]; then
-      echo "[step] Creating an SSH key (ed25519)..."
-      mkdir -p "${DEV_HOME}/.ssh"
-      chmod 700 "${DEV_HOME}/.ssh"
-      ssh-keygen -t ed25519 -C "${GIT_EMAIL:-pe-dev@local}" -f "${DEV_HOME}/.ssh/id_ed25519" -N ""
-      echo "[info] Public key:"
-      cat "${DEV_HOME}/.ssh/id_ed25519.pub"
-    fi
-}
-
 # Main execution
 main() {
-    log_info "[info] Running as: ${DEV_USER}"
     log_info "Starting Linux Toolbox setup..."
     
     # Validation phase
@@ -400,11 +358,6 @@ main() {
     # Configuration phase
     setup_fastfetch_config
     setup_bash_config || exit 1
-
-    # Optional updates
-    setup_timezone
-    setup_git_creds
-    generate_ssh
     
     log_success "Setup completed successfully!"
     log_info "Please restart your shell or run 'source ~/.bashrc' to apply changes"
