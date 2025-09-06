@@ -22,7 +22,7 @@ This repository provides a comprehensive `.bashrc` configuration along with supp
 To install the `.bashrc` configuration, execute the following commands in your terminal:
 
 ```sh
-git clone --depth=1 https://github.com/dacrab/mybash.git
+git clone --depth=1 https://github.com/davidabad98/mybash.git
 cd mybash
 ./setup.sh
 ```
@@ -35,6 +35,7 @@ The `setup.sh` script automates the installation process by:
 - Installing the MesloLGS Nerd Font required for the prompt
 - Linking configuration files (`.bashrc` and `starship.toml`) to your home directory
 - Setting up additional utilities like `fastfetch`
+- Optional git utilities
 
 Ensure you have the required permissions and a supported package manager before running the script.
 
