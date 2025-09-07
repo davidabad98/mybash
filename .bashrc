@@ -104,6 +104,9 @@ cdf() {
   dir=$(find ${1:-.} -type d 2> /dev/null | fzf +m) && cd "$dir"
 }
 
+# Search files by name (ignores .git and node_modules by default)
+alias ff='fzf --hidden --exclude .git --exclude node_modules'
+
 # Preview files with bat while picking
 alias fp="fzf --preview 'bat --style=numbers --color=always {} | head -200'"
 
