@@ -23,6 +23,12 @@ sudo apt-get install -y --no-install-recommends \
   build-essential curl git unzip ca-certificates gnupg lsb-release \
   htop nano vim pkg-config
 
+# 1.2) Install Fastfetch (latest release from GitHub)
+echo "[step] Installing Fastfetch..."
+curl -LO https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-amd64.deb
+sudo apt-get install -y ./fastfetch-linux-amd64.deb
+rm fastfetch-linux-amd64.deb
+
 # Optional timezone setup
 if [[ -n "${SET_TIMEZONE}" ]]; then
   echo "[step] Setting timezone to ${SET_TIMEZONE}..."
