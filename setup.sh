@@ -169,6 +169,13 @@ install_packages() {
             return 1
             ;;
     esac
+
+    # --- Ensure 'bat' command exists across distros ---
+    if ! command -v bat >/dev/null 2>&1 && command -v batcat >/dev/null 2>&1; then
+        log_info "Creating 'bat' symlink for compatibility..."
+        $PRIVILEGE_CMD ln -sf "$(command -v batcat)" /usr/local/bin/bat
+        log_success "'bat' symlink created"
+    fi
 }
 
 install_arch_packages() {

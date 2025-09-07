@@ -92,6 +92,31 @@ export LESS_TERMCAP_ue=$'\E[0m'
 export LESS_TERMCAP_us=$'\E[01;32m'
 
 #######################################################
+# FZF SETUP
+#######################################################
+
+# Find file and open with your $EDITOR (have hardcoded VS Code for tests)
+alias vf='code $(fzf)'
+
+# cd into a selected directory
+cdf() {
+  local dir
+  dir=$(find ${1:-.} -type d 2> /dev/null | fzf +m) && cd "$dir"
+}
+
+# Preview files with bat while picking
+alias fp="fzf --preview 'bat --style=numbers --color=always {} | head -200'"
+
+# Use fasd (if installed) or just rely on history
+alias fh='history | fzf'
+
+# Kill a process interactively
+fkill() {
+  ps -ef | sed 1d | fzf -m | awk '{print $2}' | xargs -r kill -9
+}
+
+
+#######################################################
 # MACHINE SPECIFIC ALIAS'S
 #######################################################
 
