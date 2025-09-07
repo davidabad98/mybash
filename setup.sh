@@ -313,7 +313,30 @@ setup_bash_config() {
         log_error "Bashrc template not found"
         return 1
     fi
+
+    # Ensure ~/.local/bin is on PATH
+    if ! grep -q 'export PATH="$HOME/.local/bin:$PATH"' "$bashrc"; then
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$bashrc"
+        log_success "Added ~/.local/bin to PATH"
+    fi
     
+    # Ensure starship init
+    if ! grep -q 'starship init bash' "$bashrc"; then
+        echo 'eval "$(starship init bash)"' >> "$bashrc"
+        log_success "Added starship init to .bashrc"
+    fi
+    # Ensure fzf init
+    if ! grep -q '\.fzf.bash' "$bashrc"; then
+        echo '[ -f ~/.fzf.bash ] && source ~/.fzf.bash' >> "$bashrc"
+        log_success "Added fzf init to .bashrc"
+    fi
+    # Ensure zoxide init
+    if ! grep -q 'zoxide init bash' "$bashrc"; then
+        echo 'eval "$(zoxide init bash)"' >> "$bashrc"
+        log_success "Added zoxide init to .bashrc"
+    fi
+    
+    # Link starship.toml if present
     if [ -f "$SCRIPT_DIR/starship.toml" ]; then
         ln -sf "$SCRIPT_DIR/starship.toml" "$starship_config"
         log_success "Starship configuration linked"
