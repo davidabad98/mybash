@@ -96,16 +96,32 @@ export LESS_TERMCAP_us=$'\E[01;32m'
 #######################################################
 
 # Find file and open with your $EDITOR (have hardcoded VS Code for tests)
-alias vf='code $(fzf)'
+vf() {
+    local selection
+    selection=$(find . -not -path "*/.git/*" -not -path "*/node_modules/*" 2>/dev/null \
+                | fzf --preview 'if [ -f {} ]; then bat --style=numbers --color=always {} | head -200; fi' \
+                      --preview-window=right:60%:wrap)
+
+    # Only open editor if selection is non-empty
+    if [ -n "$selection" ]; then
+        echo "Opening editor for: $selection"
+        code "$selection"
+    else
+        echo "No selection, exiting without opening editor."
+    fi
+}
 
 # cd into a selected directory
 cdf() {
   local dir
-  dir=$(find ${1:-.} -type d 2> /dev/null | fzf +m) && cd "$dir"
+  dir=$(find ${1:-.} -type d -not -path "*/.git/*" -not -path "*/node_modules/*" 2>/dev/null | fzf +m --preview 'ls -l {} | head -50')
+  [ -n "$dir" ] && cd "$dir"
 }
 
+
 # Search files by name (ignores .git and node_modules by default)
-alias ff='fzf --hidden --exclude .git --exclude node_modules'
+alias ff='find . -type f -not -path "*/.git/*" -not -path "*/node_modules/*" 2>/dev/null | fzf --preview "bat --style=numbers --color=always {} | head -200"'
+
 
 # Preview files with bat while picking
 alias fp="fzf --preview 'bat --style=numbers --color=always {} | head -200'"
