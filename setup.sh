@@ -286,30 +286,60 @@ install_zoxide() {
 }
 
 install_lazygit() {
-    if command_exists lazygit; then
-        log_info "Lazygit already installed"
-        return 0
-    fi
+  # deps: curl, grep, tar, install
+  if command -v lazygit >/dev/null 2>&1; then
+    log_info "Lazygit already installed ($(lazygit --version 2>/dev/null || echo unknown))"
+    return 0
+  fi
 
-    log_info "Installing Lazygit from GitHub releases..."
-    local repo_url="https://github.com/jesseduffield/lazygit/releases/latest/download"
-    local tarball="lazygit_$(uname -s)_$(uname -m).tar.gz"
-    local temp_dir
-    temp_dir=$(mktemp -d)
+  log_info "Installing Lazygit from GitHub releases…"
 
-    if curl -sSL "$repo_url/${tarball}" -o "$temp_dir/$tarball"; then
-        tar -xzf "$temp_dir/$tarball" -C "$temp_dir"
-        $PRIVILEGE_CMD mv "$temp_dir/lazygit" /usr/local/bin/
-        $PRIVILEGE_CMD chmod +x /usr/local/bin/lazygit
-        log_success "Lazygit installed successfully"
-    else
-        log_error "Failed to download Lazygit"
-        rm -rf "$temp_dir"
-        return 1
-    fi
+  # Map architecture for release asset names
+  arch="$(uname -m)"
+  case "$arch" in
+    x86_64|amd64) asset_arch="x86_64" ;;
+    aarch64|arm64) asset_arch="arm64" ;;
+    armv6l) asset_arch="armv6" ;;
+    *) log_error "Unsupported arch: $arch"; return 1 ;;
+  esac
 
-    rm -rf "$temp_dir"
+  # Get latest version tag (no leading 'v' in LAZYGIT_VERSION)
+  LAZYGIT_VERSION="$(
+    curl -fsSL "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" \
+    | grep -Po '"tag_name":\s*"v\K[^"]*'
+  )" || { log_error "Failed to determine latest Lazygit version"; return 1; }
+
+  # Build the correct asset name exactly as in releases
+  # Note: capital 'Linux' for x86_64 asset; arm builds use lowercase 'linux_arm64/armv6' in some releases.
+  # The project README shows Linux_x86_64 explicitly for Ubuntu.
+  if [ "$asset_arch" = "x86_64" ]; then
+    asset="lazygit_${LAZYGIT_VERSION}_Linux_${asset_arch}.tar.gz"
+  else
+    asset="lazygit_${LAZYGIT_VERSION}_linux_${asset_arch}.tar.gz"
+  fi
+
+  base="https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}"
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' EXIT
+
+  log_info "Downloading $asset (v${LAZYGIT_VERSION})…"
+  curl -fsSL -o "$tmp/lazygit.tgz" "${base}/${asset}" \
+    || { log_error "Download failed: ${base}/${asset}"; return 1; }
+
+  # Optional: verify checksum if you want extra safety (uncomment to enforce)
+  # curl -fsSL -o "$tmp/checksums.txt" "${base}/checksums.txt" || { log_error "Checksum file download failed"; return 1; }
+  # (cd "$tmp" && grep " ${asset}\$" checksums.txt | sha256sum -c -) || { log_error "Checksum verification failed"; return 1; }
+
+  tar -xzf "$tmp/lazygit.tgz" -C "$tmp" lazygit \
+    || { log_error "Failed to extract tarball"; return 1; }
+
+  # Use 'install' for proper perms and atomic move
+  ${PRIVILEGE_CMD:-sudo} install -m 0755 -D "$tmp/lazygit" /usr/local/bin/lazygit \
+    || { log_error "Failed to install to /usr/local/bin"; return 1; }
+
+  log_success "Lazygit $(/usr/local/bin/lazygit --version) installed"
 }
+
 
 
 # Configuration functions
