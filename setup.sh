@@ -123,13 +123,16 @@ setup_directories() {
 
 # Installation functions
 install_packages() {
-    local packages="bash bash-completion tar bat tree multitail fastfetch wget unzip fontconfig"
+    local packages="bash bash-completion tar bat tree multitail fastfetch wget unzip fontconfig tmux"
     if ! command_exists nvim; then
         packages="$packages neovim"
         fi
     if ! command_exists trash; then
         packages="$packages trash-cli"
         fi
+    if ! command_exists lazygit; then
+        packages="$packages lazygit"
+    fi
     
     log_info "Installing packages: $packages"
     
@@ -282,6 +285,33 @@ install_zoxide() {
     fi
 }
 
+install_lazygit() {
+    if command_exists lazygit; then
+        log_info "Lazygit already installed"
+        return 0
+    fi
+
+    log_info "Installing Lazygit from GitHub releases..."
+    local repo_url="https://github.com/jesseduffield/lazygit/releases/latest/download"
+    local tarball="lazygit_$(uname -s)_$(uname -m).tar.gz"
+    local temp_dir
+    temp_dir=$(mktemp -d)
+
+    if curl -sSL "$repo_url/${tarball}" -o "$temp_dir/$tarball"; then
+        tar -xzf "$temp_dir/$tarball" -C "$temp_dir"
+        $PRIVILEGE_CMD mv "$temp_dir/lazygit" /usr/local/bin/
+        $PRIVILEGE_CMD chmod +x /usr/local/bin/lazygit
+        log_success "Lazygit installed successfully"
+    else
+        log_error "Failed to download Lazygit"
+        rm -rf "$temp_dir"
+        return 1
+    fi
+
+    rm -rf "$temp_dir"
+}
+
+
 # Configuration functions
 setup_fastfetch_config() {
     local user_home
@@ -384,6 +414,7 @@ main() {
     install_starship || exit 1
     install_fzf || exit 1
     install_zoxide || exit 1
+    install_lazygit || exit 1
     
     # Configuration phase
     setup_fastfetch_config
