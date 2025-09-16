@@ -369,6 +369,14 @@ mkdirg() {
 	cd "$1"
 }
 
+# Quick make-directory-and-file command
+mkf() {
+    local target="$1"
+    mkdir -p "$(dirname "$target")"
+    touch "$target"
+    echo "Created: $target"
+}
+
 # Goes up a specified number of directories  (i.e. up 4)
 up() {
 	local d=""
