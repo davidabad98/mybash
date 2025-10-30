@@ -18,12 +18,19 @@ $julia\
 $nodejs\
 $nim\
 $rust\
-[](fg:#86BBD8 bg:#06969A)\
+[](fg:#86BBD8 bg:#144563)\
 $docker_context\
-[](fg:#06969A bg:#33658A)\
+[ ](fg:#144563)\
 $time\
-[ ](fg:#33658A)\
 """
+
+# This options were removed from the original design
+#after docker context:
+#[](fg:#06969A bg:#33658A)\
+#after time:
+#[ ](fg:#33658A)\
+
+
 command_timeout = 5000
 # Disable the blank line at the start of the prompt
 # add_newline = false
@@ -33,8 +40,8 @@ command_timeout = 5000
 show_always = true
 style_user = "bg:#3B4252"
 style_root = "bg:#3B4252"
-#format = '[$user ]($style)'
-format = '[ ]($style)'
+format = '[💀 $user ]($style)'
+#format = '[ ]($style)'
 
 [directory]
 style = "bg:#434C5E"
@@ -126,5 +133,5 @@ format = '[ $symbol ($version) ]($style)'
 [time]
 disabled = false
 time_format = "%R" # Hour:Minute Format
-style = "bg:#33658A"
-format = '[ $time ]($style)'
+#style = "bg:#b03838"
+format = '[$time ]($style)'
