@@ -447,8 +447,8 @@ main() {
     install_lazygit || exit 1
     
     # Configuration phase
-    setup_fastfetch_config
-    setup_bash_config || exit 1
+    #setup_fastfetch_config
+    #setup_bash_config || exit 1
     
     log_success "Setup completed successfully!"
     log_info "Please restart your shell or run 'source ~/.bashrc' to apply changes"
