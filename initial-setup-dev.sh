@@ -21,7 +21,7 @@ sudo apt-get update -y
 sudo apt-get upgrade -y
 sudo apt-get install -y --no-install-recommends \
   build-essential curl git unzip ca-certificates gnupg lsb-release \
-  htop nano vim pkg-config ripgrep
+  htop nano vim pkg-config ripgrep nodejs npm
 
 # 1.2) Install Fastfetch (latest release from GitHub)
 echo "[step] Installing Fastfetch..."
