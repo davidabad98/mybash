@@ -123,7 +123,7 @@ setup_directories() {
 
 # Installation functions
 install_packages() {
-    local packages="bash bash-completion tar bat tree multitail fastfetch wget unzip fontconfig tmux"
+    local packages="bash bash-completion tar bat tree multitail fastfetch wget unzip fontconfig tmux ncurses-term"
     if ! command_exists nvim; then
         packages="$packages neovim"
         fi
